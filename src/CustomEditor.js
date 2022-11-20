@@ -42,6 +42,12 @@ const addEntityAndComponent = (editorState, content) => {
   return EditorState.forceSelection(newEditorState, newContentState.getSelectionAfter());
 };
 
+const applySpace = (editorState) => {
+  const contentState = editorState.getCurrentContent();
+  const selection = editorState.getSelection();
+  const newContentState2 = Modifier.insertText(contentState, selection, ' ');
+  return EditorState.push(editorState, newContentState2);
+};
 class CustomEditor extends Component {
   constructor(props) {
     super(props);
@@ -94,7 +100,7 @@ class CustomEditor extends Component {
 
   handleSuggestionSelected = (text) => {
     const { editorState } = this.state;
-    const newEditorState = addEntityAndComponent(editorState, text);
+    const newEditorState = applySpace(addEntityAndComponent(applySpace(editorState), text));
     this.setState(
       {
         editorState: newEditorState,
@@ -130,9 +136,10 @@ class CustomEditor extends Component {
           editorClassName="editor"
           onEditorStateChange={this.onEditorStateChange.bind(this)}
         />
-        {/* <code>
-          <pre>{JSON.stringify(editorState.getCurrentContent()['blockMap'].length, null, 2)}</pre>
-        </code> */}
+        <code>
+          {/* ['blockMap'].length, */}
+          <pre>{JSON.stringify(editorState.getCurrentContent(), null, 2)}</pre>
+        </code>
         {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
       </div>
     );
