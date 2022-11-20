@@ -47,7 +47,7 @@ const addEntityAndComponent = (editorState, content) => {
 
   const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { content, type: content });
   const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-  const newContentState = Modifier.insertText(contentStateWithEntity, selection, content, null, entityKey);
+  const newContentState = Modifier.insertText(contentStateWithEntity, selection, ` ${content} `, null, entityKey);
 
   const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
 
