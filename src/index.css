@@ -8,7 +8,6 @@
   cursor: text;
   height: auto;
   border: 1px solid #c0c0c0;
-  width: 50vw;
   min-width: 14em;
   min-height: 9em;
   padding: 0.65em;
@@ -26,7 +25,7 @@
 }
 .editor .suggestions.overlay {
   position: absolute;
-  margin-top: 1.65em;
+  margin-top: 1.2em;
 }
 .editor .suggestions-list {
   box-shadow: 1px 0px 0.8em rgba(0, 0, 0, 0.1);

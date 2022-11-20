@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import MyDecorator1 from './MyDecorator1';
 import MyDecorator2 from './MyDecorator2';
+import DropDownList from './DropDownList';
 
 import { getDefaultKeyBinding, KeyBindingUtil, Modifier } from 'draft-js';
 const { hasCommandModifier } = KeyBindingUtil;
@@ -26,46 +27,6 @@ function getSelectionRange() {
   const selection = window.getSelection();
   if (selection.rangeCount === 0) return null;
   return selection.getRangeAt(0);
-}
-
-class DropDownList extends Component {
-  getMatchingSuggestions() {
-    return ['Component1', 'Component2'];
-  }
-
-  get position() {
-    const co = this.props.position;
-    if (!co) return {};
-    return {
-      top: co.y,
-      left: co.x,
-      zIndex: 1000,
-    };
-  }
-
-  render() {
-    const entries = this.getMatchingSuggestions();
-    const co = this.props.position;
-
-    if(co.x === 0 && co.y === 0) return null;
-
-    return (
-      entries && (
-        <nav style={this.position} className="overlay suggestions">
-          <ol className="suggestions-list">
-            {entries.map((result, index) => {
-              const select = () => this.props.onSelect(result);
-              return (
-                <li key={index} onMouseDown={select}>
-                  {result}
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
-      )
-    );
-  }
 }
 
 const addEntityAndComponent = (editorState, content) => {
@@ -124,14 +85,14 @@ class CustomEditor extends Component {
   };
 
   focus() {
-    const se = this.state.editorState.getSelection();
-    this.editor.focus();
-    this.setState({
-      editorState: EditorState.forceSelection(this.state.editorState, se),
-    });
+    // const se = this.state.editorState.getSelection();
+    // this.editor.focus();
+    // this.setState({
+    //   editorState: EditorState.forceSelection(this.state.editorState, se),
+    // });
   }
 
-  handleSuggestionSelected(text) {
+  handleSuggestionSelected = (text) => {
     const { editorState } = this.state;
     const newEditorState = addEntityAndComponent(editorState, text);
     this.setState(
@@ -147,10 +108,16 @@ class CustomEditor extends Component {
     this.setState({ position: null }, () => {
       requestAnimationFrame(() => this.focus());
     });
-  }
+  };
 
+  isShow = () => {
+    const co = this.state.position;
+    if (co && co.x > 0 && co.y > 0) return true;
+    return false;
+  };
   render() {
     const { editorState } = this.state;
+
     return (
       <div className="editor" onClick={this.focus.bind(this)}>
         <Editor
@@ -163,12 +130,10 @@ class CustomEditor extends Component {
           editorClassName="editor"
           onEditorStateChange={this.onEditorStateChange.bind(this)}
         />
-        <code>
-          <pre>{JSON.stringify(editorState.getSelection(), null, 2)}</pre>
-        </code>
-        {this.state.position && (
-          <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected.bind(this)} />
-        )}
+        {/* <code>
+          <pre>{JSON.stringify(editorState.getCurrentContent()['blockMap'].length, null, 2)}</pre>
+        </code> */}
+        {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
       </div>
     );
   }
