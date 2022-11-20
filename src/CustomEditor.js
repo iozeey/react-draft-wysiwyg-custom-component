@@ -33,11 +33,11 @@ const addEntityAndComponent = (editorState, content) => {
   const contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
 
-  const contentStateWithEntity = contentState.createEntity(content, 'IMMUTABLE', { content });
+  const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { content, type: content });
   const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
   const newContentState = Modifier.insertText(contentStateWithEntity, selection, content, null, entityKey);
 
-  const newEditorState = EditorState.push(editorState, newContentState);
+  const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
 
   return EditorState.forceSelection(newEditorState, newContentState.getSelectionAfter());
 };
@@ -48,6 +48,31 @@ const applySpace = (editorState) => {
   const newContentState2 = Modifier.insertText(contentState, selection, ' ');
   return EditorState.push(editorState, newContentState2);
 };
+
+const getEntityAtSelection = (editorState) => {
+  const selectionState = editorState.getSelection();
+  const selectionKey = selectionState.getStartKey();
+  const contentState = editorState.getCurrentContent();
+
+  // The block in which the selection starts
+  const block = contentState.getBlockForKey(selectionKey);
+
+  // Entity key at the start selection
+  const entityKey = block.getEntityAt(selectionState.getStartOffset());
+  if (entityKey) {
+    // The actual entity instance
+    const entityInstance = contentState.getEntity(entityKey);
+    const entityInfo = {
+      type: entityInstance.getType(),
+      mutability: entityInstance.getMutability(),
+      data: entityInstance.getData(),
+    };
+    return entityInfo;
+  } else {
+    return null;
+  }
+};
+
 class CustomEditor extends Component {
   constructor(props) {
     super(props);
@@ -59,8 +84,16 @@ class CustomEditor extends Component {
   }
 
   onEditorStateChange = (editorState) => {
+    if (getEntityAtSelection(editorState)) {
+      this.setState({
+        editorState,
+        position: getCaretCoordinates(),
+      });
+    }
+    // reselect at current selection and update react state
+    const se = editorState.getSelection();
     this.setState({
-      editorState,
+      editorState: EditorState.forceSelection(editorState, se),
     });
   };
 
@@ -138,7 +171,7 @@ class CustomEditor extends Component {
         />
         <code>
           {/* ['blockMap'].length, */}
-          <pre>{JSON.stringify(editorState.getCurrentContent(), null, 2)}</pre>
+          <pre>{JSON.stringify(editorState, null, 2)}</pre>
         </code>
         {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
       </div>
