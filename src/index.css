@@ -4,7 +4,7 @@
   display: flex;
   padding: 2em;
 }
-.editor {
+.editor-wrapper {
   cursor: text;
   height: auto;
   border: 1px solid #c0c0c0;
@@ -14,7 +14,7 @@
   border-radius: 2px;
   background-color: white;
 }
-.editor .suggestion.label {
+.editor-wrapper .suggestion.label {
   color: white;
   background-color: #6078f0;
   border-radius: 2px;
@@ -23,11 +23,11 @@
   padding: 0 4px;
   display: inline-block;
 }
-.editor .suggestions.overlay {
+.editor-wrapper .suggestions.overlay {
   position: absolute;
   margin-top: 1.2em;
 }
-.editor .suggestions-list {
+.editor-wrapper .suggestions-list {
   box-shadow: 1px 0px 0.8em rgba(0, 0, 0, 0.1);
   border: 1px solid #e0e0e0;
   font-size: 0.82em;
@@ -36,14 +36,14 @@
   background: white;
   overflow: hidden;
 }
-.editor .suggestions-list li {
+.editor-wrapper .suggestions-list li {
   padding: 0.2em 2em 0.2em 1em;
   color: inherit;
   background-color: transparent;
   transition: color 200ms, background-color 200ms, border-color 200ms;
 }
-.editor .suggestions-list li:hover,
-.editor .suggestions-list li:focus {
+.editor-wrapper .suggestions-list li:hover,
+.editor-wrapper .suggestions-list li:focus {
   cursor: pointer;
   color: #eee;
   background-color: #404ad0;
@@ -55,16 +55,6 @@
 body {
   font: 300 22px/1.675 Helvetica Neue, Roboto, Arial, sans-seif;
   background-color: hsl(218, 100%, 98%);
-}
-h1 {
-  text-align: center;
-  text-transorm: uppercase;
-  font-size: 6vw;
-  padding: 1em 0 0;
-  line-height: 1em;
-  font-weight: 900;
-  -webkit-text-stroke: 0.1em;
-  letter-spacing: -0.05em;
 }
 p {
   text-align: center;

@@ -9,24 +9,34 @@ import { getDefaultKeyBinding, KeyBindingUtil, Modifier } from 'draft-js';
 const { hasCommandModifier } = KeyBindingUtil;
 const OPEN_DROPDOWN = 'OPEN-DROPDOWN';
 
-const CaretCoordinates = {
+const caretCoordinates = {
   x: 0,
   y: 0,
 };
-
-function getCaretCoordinates() {
-  const range = getSelectionRange();
-  if (range) {
-    const { left: x, top: y } = range.getBoundingClientRect();
-    Object.assign(CaretCoordinates, { x, y });
-  }
-  return CaretCoordinates;
-}
 
 function getSelectionRange() {
   const selection = window.getSelection();
   if (selection.rangeCount === 0) return null;
   return selection.getRangeAt(0);
+}
+
+function getCaretCoordinates(hasFocus, focusKey) {
+  const range = getSelectionRange();
+  
+  if (range) {
+    const { left: x, top: y } = range.getBoundingClientRect();
+    Object.assign(caretCoordinates, { x, y });
+  }
+
+  if (hasFocus && caretCoordinates.x === 0 && caretCoordinates.y === 0) {
+    // just grab the position of our editor current selection's block
+    const currentSelectionNodeBounds = document.querySelector(`[data-offset-key^="${focusKey}"]`).getBoundingClientRect();
+    Object.assign(caretCoordinates, {
+      x: currentSelectionNodeBounds.x,
+      y: currentSelectionNodeBounds.y,
+    });
+  }
+  return caretCoordinates;
 }
 
 const addEntityAndComponent = (editorState, content) => {
@@ -99,9 +109,15 @@ class CustomEditor extends Component {
 
   handleKeyCommand = (commandString) => {
     if (commandString === OPEN_DROPDOWN) {
+      const { editorState } = this.state;
+
+      const focusKey = editorState.getSelection().getFocusKey();
+      const hasFocus = this.state.editorState.getSelection()['hasFocus'];
+
       this.setState({
-        position: getCaretCoordinates(),
+        position: getCaretCoordinates(hasFocus, focusKey),
       });
+
       return true;
     }
 
@@ -157,28 +173,30 @@ class CustomEditor extends Component {
   isShow = () => {
     const co = this.state.position;
     if (co && co.x > 0 && co.y > 0) return true;
+
     return false;
   };
   render() {
     const { editorState } = this.state;
 
     return (
-      <div className="editor" onClick={this.focus.bind(this)}>
-        <Editor
-          editorRef={(node) => (this.editor = node)}
-          keyBindingFn={this.myKeyBindingFn}
-          handleKeyCommand={this.handleKeyCommand.bind(this)}
-          editorState={editorState}
-          customDecorators={[MyDecorator1, MyDecorator2]}
-          wrapperClassName="wrapper"
-          editorClassName="editor"
-          onEditorStateChange={this.onEditorStateChange.bind(this)}
-        />
+      <div>
+        <div className="editor-wrapper" onClick={this.focus.bind(this)}>
+          <Editor
+            editorRef={(node) => (this.editor = node)}
+            keyBindingFn={this.myKeyBindingFn}
+            handleKeyCommand={this.handleKeyCommand.bind(this)}
+            editorState={editorState}
+            customDecorators={[MyDecorator1, MyDecorator2]}
+            editorClassName="editor"
+            onEditorStateChange={this.onEditorStateChange.bind(this)}
+          />
+          {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
+        </div>
         <code>
           {/* ['blockMap'].length, */}
-          <pre>{JSON.stringify(editorState.getSelection(), null, 2)}</pre>
+          <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre>
         </code>
-        {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
       </div>
     );
   }
