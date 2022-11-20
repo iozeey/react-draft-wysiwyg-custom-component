@@ -144,23 +144,22 @@ class CustomEditor extends Component {
   };
 
   myKeyBindingFn = (e) => {
+    console.log(e.keyCode);
     if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
-    if (e.keyCode === 27) {
+    if ([27, 37, 39].indexOf(e.keyCode) !== -1) {
       this.closeDropDown();
     }
+
     return getDefaultKeyBinding(e);
   };
 
   closeDropDown = () => {
-    const entityObject = getEntityAtSelection(this.state.editorState);
-    if (!entityObject) {
-      this.setState({
-        position: null,
-        isShowDropDown: false,
-      });
-    }
+    this.setState({
+      position: null,
+      isShowDropDown: false,
+    });
   };
 
   performOnClickActions() {
