@@ -1,13 +1,82 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.app {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  padding: 2em;
 }
-
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.editor {
+  cursor: text;
+  height: auto;
+  border: 1px solid #c0c0c0;
+  width: 50vw;
+  min-width: 14em;
+  min-height: 9em;
+  padding: 0.65em;
+  border-radius: 2px;
+  background-color: white;
+}
+.editor .suggestion.label {
+  color: white;
+  background-color: #6078f0;
+  border-radius: 2px;
+  margin-bottom: 1px;
+  margin-right: 1px;
+  padding: 0 4px;
+  display: inline-block;
+}
+.editor .suggestions.overlay {
+  position: absolute;
+  margin-top: 1.65em;
+}
+.editor .suggestions-list {
+  box-shadow: 1px 0px 0.8em rgba(0, 0, 0, 0.1);
+  border: 1px solid #e0e0e0;
+  font-size: 0.82em;
+  line-height: 1.4em;
+  border-radius: 2px;
+  background: white;
+  overflow: hidden;
+}
+.editor .suggestions-list li {
+  padding: 0.2em 2em 0.2em 1em;
+  color: inherit;
+  background-color: transparent;
+  transition: color 200ms, background-color 200ms, border-color 200ms;
+}
+.editor .suggestions-list li:hover,
+.editor .suggestions-list li:focus {
+  cursor: pointer;
+  color: #eee;
+  background-color: #404ad0;
+}
+/**
+ * General styles not directly related to 
+ * the functioality of this pen.
+ */
+body {
+  font: 300 22px/1.675 Helvetica Neue, Roboto, Arial, sans-seif;
+  background-color: hsl(218, 100%, 98%);
+}
+h1 {
+  text-align: center;
+  text-transorm: uppercase;
+  font-size: 6vw;
+  padding: 1em 0 0;
+  line-height: 1em;
+  font-weight: 900;
+  -webkit-text-stroke: 0.1em;
+  letter-spacing: -0.05em;
+}
+p {
+  text-align: center;
+  padding: 0 6vw;
+}
+.delim {
+  font-weight: 500;
+  color: #8090e0;
+  font-size: 1.35em;
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 1em;
+  margin-top: -4.5px;
 }
