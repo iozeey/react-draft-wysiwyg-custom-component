@@ -18,33 +18,48 @@ class DropDownList extends Component {
 
   render() {
     const entries = this.getMatchingSuggestions();
+    // return( <Dropdown>
+    //   <Dropdown.Toggle variant="success" id="dropdown-basic">
+    //     Dropdown Button
+    //   </Dropdown.Toggle>
 
+    //   <Dropdown.Menu>
+    //     <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+    //     <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+    //     <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+    //   </Dropdown.Menu>
+    // </Dropdown>)
     return (
-      entries && (
-        <Dropdown
-          show
-          style={this.position}
-          className="overlay suggestions"
-          onSelect={(e) => {
-            this.props.onSelect(e);
-          }}
+      <Dropdown
+        className="overlay suggestions"
+        autoClose="outside"
+        id="cList"
+        // role="menu"
+        // navbar
+        keydown={(e) => {
+          console.log(e);
+        }}
+        show={this.props.show}
+        focusFirstItemOnShow="keyboard"
+        style={this.position}
+        onSelect={(e) => {
+          this.props.onSelect(e);
+        }}
+      >
+        <Dropdown.Menu
+          // ariaLabelledby="dropdown-basic"
+          className="suggestions-list"
+          show={this.props.show}
         >
-          <Dropdown.Menu className="suggestions-list">
-            {entries.map((result, index) => {
-
-              return (
-                <Dropdown.Item
-                  key={index}
-                  eventKey={result}
-                  tabIndex={index}
-                >
-                  {result}
-                </Dropdown.Item>
-              );
-            })}
-          </Dropdown.Menu>
-        </Dropdown>
-      )
+          {entries.map((result, index) => {
+            return (
+              <Dropdown.Item active={this.props.activeItem === result} key={index} eventKey={result} href={`#index-${index}`}>
+                {result}
+              </Dropdown.Item>
+            );
+          })}
+        </Dropdown.Menu>
+      </Dropdown>
     );
   }
 }

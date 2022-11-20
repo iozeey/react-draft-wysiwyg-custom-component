@@ -14,40 +14,12 @@
   border-radius: 2px;
   background-color: white;
 }
-.editor-wrapper .suggestion.label {
-  color: white;
-  background-color: #6078f0;
-  border-radius: 2px;
-  margin-bottom: 1px;
-  margin-right: 1px;
-  padding: 0 4px;
-  display: inline-block;
-}
+ 
 .editor-wrapper .suggestions.overlay {
   position: absolute;
   margin-top: 1.2em;
 }
-.editor-wrapper .suggestions-list {
-  box-shadow: 1px 0px 0.8em rgba(0, 0, 0, 0.1);
-  border: 1px solid #e0e0e0;
-  font-size: 0.82em;
-  line-height: 1.4em;
-  border-radius: 2px;
-  background: white;
-  overflow: hidden;
-}
-.editor-wrapper .suggestions-list li {
-  padding: 0.2em 2em 0.2em 1em;
-  color: inherit;
-  background-color: transparent;
-  transition: color 200ms, background-color 200ms, border-color 200ms;
-}
-.editor-wrapper .suggestions-list li:hover,
-.editor-wrapper .suggestions-list li:focus {
-  cursor: pointer;
-  color: #eee;
-  background-color: #404ad0;
-}
+
 /**
  * General styles not directly related to 
  * the functioality of this pen.

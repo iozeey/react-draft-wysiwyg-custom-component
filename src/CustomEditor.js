@@ -102,10 +102,8 @@ class CustomEditor extends Component {
         position: getCaretCoordinates(),
       });
     }
-    // reselect at current selection and update react state
-    const se = editorState.getSelection();
     this.setState({
-      editorState: EditorState.forceSelection(editorState, se),
+      editorState: editorState,
     });
   };
 
@@ -139,16 +137,23 @@ class CustomEditor extends Component {
     if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
+    if (e.keyCode === 27) {
+      this.closeDropDown();
+    }
     return getDefaultKeyBinding(e);
   };
 
-  performOnClickActions() {
-    // if not an entity the close the dropdown
+  closeDropDown = () => {
     if (!getEntityAtSelection(this.state.editorState)) {
       this.setState({
         position: null,
       });
     }
+  };
+
+  performOnClickActions() {
+    // if not an entity the close the dropdown
+    this.closeDropDown();
   }
 
   handleSuggestionSelected = (text) => {
@@ -182,7 +187,7 @@ class CustomEditor extends Component {
   };
   render() {
     const { editorState } = this.state;
-
+    const ce = getEntityAtSelection(editorState);
     return (
       <div>
         <div className="editor-wrapper" onClick={this.performOnClickActions.bind(this)}>
@@ -195,10 +200,15 @@ class CustomEditor extends Component {
             editorClassName="editor"
             onEditorStateChange={this.onEditorStateChange.bind(this)}
           />
-          {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
+
+          <DropDownList
+            show={this.isShow()}
+            activeItem={ce ? ce.type : null}
+            position={this.state.position}
+            onSelect={this.handleSuggestionSelected}
+          />
         </div>
         <code>
-          {/* ['blockMap'].length, */}
           <pre>{JSON.stringify(editorState, null, 4)}</pre>
         </code>
       </div>
