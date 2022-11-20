@@ -22,7 +22,7 @@ function getSelectionRange() {
 
 function getCaretCoordinates(hasFocus, focusKey) {
   const range = getSelectionRange();
-  
+
   if (range) {
     const { left: x, top: y } = range.getBoundingClientRect();
     Object.assign(caretCoordinates, { x, y });
@@ -30,7 +30,9 @@ function getCaretCoordinates(hasFocus, focusKey) {
 
   if (hasFocus && caretCoordinates.x === 0 && caretCoordinates.y === 0) {
     // just grab the position of our editor current selection's block
-    const currentSelectionNodeBounds = document.querySelector(`[data-offset-key^="${focusKey}"]`).getBoundingClientRect();
+    const currentSelectionNodeBounds = document
+      .querySelector(`[data-offset-key^="${focusKey}"]`)
+      .getBoundingClientRect();
     Object.assign(caretCoordinates, {
       x: currentSelectionNodeBounds.x,
       y: currentSelectionNodeBounds.y,
@@ -108,6 +110,7 @@ class CustomEditor extends Component {
   };
 
   handleKeyCommand = (commandString) => {
+    console.log(commandString);
     if (commandString === OPEN_DROPDOWN) {
       const { editorState } = this.state;
 
@@ -139,12 +142,13 @@ class CustomEditor extends Component {
     return getDefaultKeyBinding(e);
   };
 
-  focus() {
-    // const se = this.state.editorState.getSelection();
-    // this.editor.focus();
-    // this.setState({
-    //   editorState: EditorState.forceSelection(this.state.editorState, se),
-    // });
+  performOnClickActions() {
+    // if not an entity the close the dropdown
+    if (!getEntityAtSelection(this.state.editorState)) {
+      this.setState({
+        position: null,
+      });
+    }
   }
 
   handleSuggestionSelected = (text) => {
@@ -181,7 +185,7 @@ class CustomEditor extends Component {
 
     return (
       <div>
-        <div className="editor-wrapper" onClick={this.focus.bind(this)}>
+        <div className="editor-wrapper" onClick={this.performOnClickActions.bind(this)}>
           <Editor
             editorRef={(node) => (this.editor = node)}
             keyBindingFn={this.myKeyBindingFn}
@@ -195,7 +199,7 @@ class CustomEditor extends Component {
         </div>
         <code>
           {/* ['blockMap'].length, */}
-          <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre>
+          <pre>{JSON.stringify(editorState, null, 4)}</pre>
         </code>
       </div>
     );
