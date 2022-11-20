@@ -56,9 +56,12 @@ const addEntityAndComponent = (editorState, content) => {
     const block = contentState.getBlockForKey(anchorKey);
 
     var myEntityRange = [];
+    var myEntityText = '';
+    var pText = contentState.getPlainText();
     block.getCharacterList().map((x, index) => {
       if (x.entity === currentEntity.entityKey) {
         myEntityRange.push(index);
+        myEntityText += pText[index];
       }
       return myEntityRange;
     });
@@ -75,7 +78,22 @@ const addEntityAndComponent = (editorState, content) => {
       null,
       entityKey
     );
-  } else newContentState = Modifier.insertText(contentStateWithEntity, selection, ` ${content} `, null, entityKey);
+
+    // ADD EXISTING CONTENT AS SIMPLE ENTITY
+    const newEditorState1 = EditorState.push(editorState, newContentState, 'INSERT-EXISTING-OLD-AS-ENTITY');
+    let contentState1 = newEditorState1.getCurrentContent();
+
+    const contentStateWithEntity1 = contentState1.createEntity(myEntityText, 'MUTABLE', { content, type: content });
+    // const entityKey1 = contentStateWithEntity1.getLastCreatedEntityKey();
+
+    newContentState = Modifier.insertText(
+      contentState1,
+      newEditorState1.getSelection(),
+      myEntityText,
+      null,
+      // entityKey1
+    );
+  } else newContentState = Modifier.insertText(contentStateWithEntity, selection, `${content}`, null, entityKey);
 
   const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
 
@@ -102,7 +120,8 @@ const getEntityAtSelection = (editorState) => {
   if (entityKey) {
     // The actual entity instance
     const entityInstance = contentState.getEntity(entityKey);
-    // console.log(selectionState, JSON.stringify(selectionState),selectionKey, entityInstance)
+    console.log(selectionState, JSON.stringify(selectionState), selectionKey, entityInstance);
+    console.log(JSON.stringify(entityInstance));
     const entityInfo = {
       type: entityInstance.getType(),
       mutability: entityInstance.getMutability(),
