@@ -1,9 +1,9 @@
 import { EditorState, RichUtils } from 'draft-js';
 import React, { Component } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
+import DropDownList, { getMatchingSuggestions } from './DropDownList';
 import MyDecorator1 from './MyDecorator1';
 import MyDecorator2 from './MyDecorator2';
-import DropDownList, { getMatchingSuggestions } from './DropDownList';
 
 import { getDefaultKeyBinding, KeyBindingUtil, Modifier } from 'draft-js';
 const { hasCommandModifier } = KeyBindingUtil;
@@ -42,12 +42,40 @@ function getCaretCoordinates(hasFocus, focusKey) {
 }
 
 const addEntityAndComponent = (editorState, content) => {
-  const contentState = editorState.getCurrentContent();
+  const currentEntity = getEntityAtSelection(editorState);
+
+  let contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
 
   const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { content, type: content });
   const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-  const newContentState = Modifier.insertText(contentStateWithEntity, selection, ` ${content} `, null, entityKey);
+
+  let newContentState;
+  if (currentEntity && currentEntity.entityKey) {
+    const anchorKey = selection.getAnchorKey();
+    const block = contentState.getBlockForKey(anchorKey);
+
+    var myEntityRange = [];
+    block.getCharacterList().map((x, index) => {
+      if (x.entity === currentEntity.entityKey) {
+        myEntityRange.push(index);
+      }
+      return myEntityRange;
+    });
+
+    const selectionToReBeReplace = selection.merge({
+      anchorOffset: myEntityRange[0],
+      focusOffset: myEntityRange[myEntityRange.length - 1] + 1,
+    });
+
+    newContentState = Modifier.replaceText(
+      contentStateWithEntity,
+      selectionToReBeReplace,
+      ` ${content} `,
+      null,
+      entityKey
+    );
+  } else newContentState = Modifier.insertText(contentStateWithEntity, selection, ` ${content} `, null, entityKey);
 
   const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
 
@@ -74,10 +102,12 @@ const getEntityAtSelection = (editorState) => {
   if (entityKey) {
     // The actual entity instance
     const entityInstance = contentState.getEntity(entityKey);
+    // console.log(selectionState, JSON.stringify(selectionState),selectionKey, entityInstance)
     const entityInfo = {
       type: entityInstance.getType(),
       mutability: entityInstance.getMutability(),
       data: entityInstance.getData(),
+      entityKey,
     };
     return entityInfo;
   } else {
@@ -117,7 +147,6 @@ class CustomEditor extends Component {
   };
 
   handleKeyCommand = (commandString) => {
-    console.log(commandString);
     if (commandString === OPEN_DROPDOWN) {
       const { editorState } = this.state;
 
@@ -144,7 +173,6 @@ class CustomEditor extends Component {
   };
 
   myKeyBindingFn = (e) => {
-    console.log(e.keyCode);
     if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
@@ -230,6 +258,7 @@ class CustomEditor extends Component {
           />
         </div>
         <code>
+          <pre>{JSON.stringify(editorState.getCurrentContent(), null, 4)}</pre>
           <pre>{JSON.stringify(getEntityAtSelection(editorState), null, 4)}</pre>
           <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre>
         </code>
