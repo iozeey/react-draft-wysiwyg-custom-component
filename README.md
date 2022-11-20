@@ -10,19 +10,18 @@ To see its working type something in editor and press the key combination.
 `cmd+k` or `ctrl+k`
 
 # Covered cases
-- User can add custom component via selection by using decorators and strategy
+- Users can add custom components via selection by using decorators and strategy
 - Handle the default commands via RitchUtils
-- Prevent dropdown from rendering if we have zero co-oridinate
-- Show dropdown when click on entity
-- Close dropdown when cursor move out of Entity
+- Prevent dropdown from rendering if we have zero co-ordinate
+- Show dropdown when clicking on an entity
+- Close the dropdown when the cursor moves out of Entity
 - Add some space to allow edit at the end
-- Apple authored and apple committed 14 hours ago
-- Do not show menu on selection 
-- Show dropdown based in show prop 
-- Open dropdown when lines are empty based on nodes in DOM
-- Readjust the cursor position based on new editor state
-- If at current cursor position there is no entity detected then close the dropdown
-- Open dropdown at current entity 
+- Do not show the menu on the selection
+- Show dropdown based on show prop
+- Show dropdown when lines are empty based on nodes in DOM
+- Readjust the cursor position based on the new editor state
+- If at the current cursor position there is no entity detected then close the dropdown
+- The open dropdown at the current entity
 - Insert some empty entities around component
 - Replaced inline styles with classes
-- Add boostrap dropdown menu and handle keyboard
+- Add bootstrap dropdown menu and handle keyboard
