@@ -45,6 +45,10 @@ class DropDownList extends Component {
 
   render() {
     const entries = this.getMatchingSuggestions();
+    const co = this.props.position;
+
+    if(co.x === 0 && co.y === 0) return null;
+
     return (
       entries && (
         <nav style={this.position} className="overlay suggestions">
@@ -100,7 +104,7 @@ class CustomEditor extends Component {
       });
       return true;
     }
-    
+
     // handle rest of the commands
     const { editorState } = this.state;
 
@@ -113,7 +117,6 @@ class CustomEditor extends Component {
   };
 
   myKeyBindingFn = (e) => {
-    console.log(e.keyCode)
     if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
@@ -163,7 +166,6 @@ class CustomEditor extends Component {
         <code>
           <pre>{JSON.stringify(editorState.getSelection(), null, 2)}</pre>
         </code>
-
         {this.state.position && (
           <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected.bind(this)} />
         )}
