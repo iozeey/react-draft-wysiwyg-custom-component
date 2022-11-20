@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import MyDecorator1 from './MyDecorator1';
 import MyDecorator2 from './MyDecorator2';
-import DropDownList from './DropDownList';
+import DropDownList, { getMatchingSuggestions } from './DropDownList';
 
 import { getDefaultKeyBinding, KeyBindingUtil, Modifier } from 'draft-js';
 const { hasCommandModifier } = KeyBindingUtil;
@@ -92,19 +92,29 @@ class CustomEditor extends Component {
     this.state = {
       editorState: EditorState.createEmpty(),
       position: null,
+      isShowDropDown: false,
     };
   }
 
+  isSelectionRange = (editorState) => {
+    const s = editorState.getSelection();
+    return s.getAnchorOffset() != s.getFocusOffset();
+  };
+
   onEditorStateChange = (editorState) => {
-    if (getEntityAtSelection(editorState)) {
-      this.setState({
-        editorState,
-        position: getCaretCoordinates(),
-      });
+    let tempState = this.state;
+    const entityObject = getEntityAtSelection(editorState);
+    if (entityObject && !this.isSelectionRange(editorState)) {
+      if (getMatchingSuggestions().indexOf(entityObject.type) != -1) {
+        return this.setState({
+          editorState,
+          position: getCaretCoordinates(),
+          isShowDropDown: true,
+        });
+      }
     }
-    this.setState({
-      editorState: editorState,
-    });
+
+    this.setState({ editorState });
   };
 
   handleKeyCommand = (commandString) => {
@@ -117,6 +127,7 @@ class CustomEditor extends Component {
 
       this.setState({
         position: getCaretCoordinates(hasFocus, focusKey),
+        isShowDropDown: true,
       });
 
       return true;
@@ -144,9 +155,11 @@ class CustomEditor extends Component {
   };
 
   closeDropDown = () => {
-    if (!getEntityAtSelection(this.state.editorState)) {
+    const entityObject = getEntityAtSelection(this.state.editorState);
+    if (!entityObject) {
       this.setState({
         position: null,
+        isShowDropDown: false,
       });
     }
   };
@@ -166,25 +179,32 @@ class CustomEditor extends Component {
       () => {
         this.setState({
           position: null,
+          isShowDropDown: false,
         });
       }
     );
-    this.setState({ position: null }, () => {
+    this.setState({ position: null, isShowDropDown: false }, () => {
       // readjust the cursor position based on new editor state
       const se = newEditorState.getSelection();
       this.editor.focus();
       this.setState({
         editorState: EditorState.forceSelection(newEditorState, se),
+        isShowDropDown: false,
       });
     });
   };
 
-  isShow = () => {
+  isShowAble = () => {
     const co = this.state.position;
-    if (co && co.x > 0 && co.y > 0) return true;
+    if (co && co.x > 0 && co.y > 0 && this.state.isShowDropDown) return true;
 
+    const entityObject = getEntityAtSelection(this.state.editorState);
+
+    if (entityObject && this.state.isShowDropDown && !this.isSelectionRange(this.state.editorState))
+      return getMatchingSuggestions().indexOf(entityObject.type) != -1;
     return false;
   };
+
   render() {
     const { editorState } = this.state;
     const ce = getEntityAtSelection(editorState);
@@ -202,14 +222,15 @@ class CustomEditor extends Component {
           />
 
           <DropDownList
-            show={this.isShow()}
+            show={this.isShowAble() && !this.isSelectionRange(editorState)}
             activeItem={ce ? ce.type : null}
             position={this.state.position}
             onSelect={this.handleSuggestionSelected}
           />
         </div>
         <code>
-          <pre>{JSON.stringify(editorState, null, 4)}</pre>
+          <pre>{JSON.stringify(getEntityAtSelection(editorState), null, 4)}</pre>
+          <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre>
         </code>
       </div>
     );
