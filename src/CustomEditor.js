@@ -1,4 +1,4 @@
-import { EditorState } from 'draft-js';
+import { EditorState, RichUtils } from 'draft-js';
 import React, { Component } from 'react';
 import { Editor } from 'react-draft-wysiwyg';
 import MyDecorator1 from './MyDecorator1';
@@ -94,14 +94,27 @@ class CustomEditor extends Component {
   };
 
   handleKeyCommand = (commandString) => {
-    if (commandString === OPEN_DROPDOWN)
+    if (commandString === OPEN_DROPDOWN) {
       this.setState({
         position: getCaretCoordinates(),
       });
+      return true;
+    }
+    
+    // handle rest of the commands
+    const { editorState } = this.state;
+
+    const newState = RichUtils.handleKeyCommand(editorState, commandString);
+    if (newState) {
+      this.onEditorStateChange(newState);
+      return true;
+    }
+    return false;
   };
 
   myKeyBindingFn = (e) => {
-    if (e.keyCode === 73 /* `I` key */ && hasCommandModifier(e)) {
+    console.log(e.keyCode)
+    if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
     return getDefaultKeyBinding(e);
@@ -140,12 +153,12 @@ class CustomEditor extends Component {
         <Editor
           editorRef={(node) => (this.editor = node)}
           keyBindingFn={this.myKeyBindingFn}
-          handleKeyCommand={this.handleKeyCommand}
+          handleKeyCommand={this.handleKeyCommand.bind(this)}
           editorState={editorState}
           customDecorators={[MyDecorator1, MyDecorator2]}
           wrapperClassName="wrapper"
           editorClassName="editor"
-          onEditorStateChange={this.onEditorStateChange}
+          onEditorStateChange={this.onEditorStateChange.bind(this)}
         />
         <code>
           <pre>{JSON.stringify(editorState.getSelection(), null, 2)}</pre>
