@@ -145,7 +145,12 @@ class CustomEditor extends Component {
       }
     );
     this.setState({ position: null }, () => {
-      requestAnimationFrame(() => this.focus());
+      // readjust the cursor position based on new editor state
+      const se = newEditorState.getSelection();
+      this.editor.focus();
+      this.setState({
+        editorState: EditorState.forceSelection(newEditorState, se),
+      });
     });
   };
 
@@ -171,7 +176,7 @@ class CustomEditor extends Component {
         />
         <code>
           {/* ['blockMap'].length, */}
-          <pre>{JSON.stringify(editorState, null, 2)}</pre>
+          <pre>{JSON.stringify(editorState.getSelection(), null, 2)}</pre>
         </code>
         {this.isShow() && <DropDownList position={this.state.position} onSelect={this.handleSuggestionSelected} />}
       </div>
