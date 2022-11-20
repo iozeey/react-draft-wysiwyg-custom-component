@@ -164,7 +164,10 @@ class CustomEditor extends Component {
 
   performOnClickActions() {
     // if not an entity the close the dropdown
-    this.closeDropDown();
+    const entityObject = getEntityAtSelection(this.state.editorState);
+    if (!entityObject) {
+      this.closeDropDown();
+    }
   }
 
   handleSuggestionSelected = (text) => {
