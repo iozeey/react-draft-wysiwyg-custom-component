@@ -25,3 +25,4 @@ To see its working type something in editor and press the key combination.
 - Insert some empty entities around component
 - Replaced inline styles with classes
 - Add bootstrap dropdown menu and handle keyboard
+- Allow to Replace entity when selected new from dropdown
