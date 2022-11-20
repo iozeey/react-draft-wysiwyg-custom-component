@@ -98,14 +98,13 @@ class CustomEditor extends Component {
 
   isSelectionRange = (editorState) => {
     const s = editorState.getSelection();
-    return s.getAnchorOffset() != s.getFocusOffset();
+    return s.getAnchorOffset() !== s.getFocusOffset();
   };
 
   onEditorStateChange = (editorState) => {
-    let tempState = this.state;
     const entityObject = getEntityAtSelection(editorState);
     if (entityObject && !this.isSelectionRange(editorState)) {
-      if (getMatchingSuggestions().indexOf(entityObject.type) != -1) {
+      if (getMatchingSuggestions().indexOf(entityObject.type) !== -1) {
         return this.setState({
           editorState,
           position: getCaretCoordinates(),
@@ -201,7 +200,7 @@ class CustomEditor extends Component {
     const entityObject = getEntityAtSelection(this.state.editorState);
 
     if (entityObject && this.state.isShowDropDown && !this.isSelectionRange(this.state.editorState))
-      return getMatchingSuggestions().indexOf(entityObject.type) != -1;
+      return getMatchingSuggestions().indexOf(entityObject.type) !== -1;
     return false;
   };
 
