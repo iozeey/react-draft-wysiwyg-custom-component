@@ -36,7 +36,7 @@ class DropDownList extends Component {
                 <Dropdown.Item
                   key={index}
                   eventKey={result}
-                 
+                  tabIndex={index}
                 >
                   {result}
                 </Dropdown.Item>
