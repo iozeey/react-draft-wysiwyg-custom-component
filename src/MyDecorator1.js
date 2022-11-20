@@ -10,7 +10,7 @@ const findMe = (contentBlock, callback, contentState) => {
   }, callback);
 };
 
-const renderMe = (props) => <span style={{ backgroundColor: 'lightgreen' }}>{props.children}</span>;
+const renderMe = (props) => <span className='component-wrapper green'>{props.children}</span>;
 
 const MyDecorator1 = {
   strategy: findMe,

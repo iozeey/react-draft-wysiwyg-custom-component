@@ -70,12 +70,12 @@ p {
   text-align: center;
   padding: 0 6vw;
 }
-.delim {
-  font-weight: 500;
-  color: #8090e0;
-  font-size: 1.35em;
-  display: inline-block;
-  vertical-align: middle;
-  line-height: 1em;
-  margin-top: -4.5px;
+.component-wrapper {
+  border: 1px solid #e0e0e0;
+}
+.green{
+  background-color: green;
+}
+.red{
+  background-color: red;
 }
