@@ -37,7 +37,7 @@ class DropDownList extends Component {
                 active={this.props.activeItem === result}
                 key={index}
                 eventKey={result}
-                href={`#${result}`}
+                // href={`#${result}`}
               >
                 {result}
               </Dropdown.Item>
