@@ -74,25 +74,25 @@ const addEntityAndComponent = (editorState, content) => {
     newContentState = Modifier.replaceText(
       contentStateWithEntity,
       selectionToReBeReplace,
-      ` ${content} `,
+      ` ${content.trim()} `,
       null,
       entityKey
     );
 
     // ADD EXISTING CONTENT AS SIMPLE ENTITY
-    const newEditorState1 = EditorState.push(editorState, newContentState, 'INSERT-EXISTING-OLD-AS-ENTITY');
-    let contentState1 = newEditorState1.getCurrentContent();
+    // const newEditorState1 = EditorState.push(editorState, newContentState, 'INSERT-EXISTING-OLD-AS-ENTITY');
+    // let contentState1 = newEditorState1.getCurrentContent();
 
     // const contentStateWithEntity1 = contentState1.createEntity(myEntityText, 'MUTABLE', { content, type: content });
     // const entityKey1 = contentStateWithEntity1.getLastCreatedEntityKey();
 
-    newContentState = Modifier.insertText(
-      contentState1,
-      newEditorState1.getSelection(),
-      myEntityText,
-      null
-      // entityKey1
-    );
+    // newContentState = Modifier.insertText(
+    //   contentState1,
+    //   newEditorState1.getSelection(),
+    //   myEntityText,
+    //   null
+    //   // entityKey1
+    // );
   } else newContentState = Modifier.insertText(contentStateWithEntity, selection, `${content}`, null, entityKey);
 
   const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
