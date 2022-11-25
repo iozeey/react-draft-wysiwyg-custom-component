@@ -83,14 +83,14 @@ const addEntityAndComponent = (editorState, content) => {
     const newEditorState1 = EditorState.push(editorState, newContentState, 'INSERT-EXISTING-OLD-AS-ENTITY');
     let contentState1 = newEditorState1.getCurrentContent();
 
-    const contentStateWithEntity1 = contentState1.createEntity(myEntityText, 'MUTABLE', { content, type: content });
+    // const contentStateWithEntity1 = contentState1.createEntity(myEntityText, 'MUTABLE', { content, type: content });
     // const entityKey1 = contentStateWithEntity1.getLastCreatedEntityKey();
 
     newContentState = Modifier.insertText(
       contentState1,
       newEditorState1.getSelection(),
       myEntityText,
-      null,
+      null
       // entityKey1
     );
   } else newContentState = Modifier.insertText(contentStateWithEntity, selection, `${content}`, null, entityKey);
@@ -120,8 +120,8 @@ const getEntityAtSelection = (editorState) => {
   if (entityKey) {
     // The actual entity instance
     const entityInstance = contentState.getEntity(entityKey);
-    console.log(selectionState, JSON.stringify(selectionState), selectionKey, entityInstance);
-    console.log(JSON.stringify(entityInstance));
+    // console.log(selectionState, JSON.stringify(selectionState), selectionKey, entityInstance);
+    // console.log(JSON.stringify(entityInstance));
     const entityInfo = {
       type: entityInstance.getType(),
       mutability: entityInstance.getMutability(),
@@ -150,8 +150,44 @@ class CustomEditor extends Component {
     return s.getAnchorOffset() !== s.getFocusOffset();
   };
 
+  addOnCurrentSelection = (editorState, content) => {
+    const currentSelection = editorState.getSelection();
+
+    let contentState = editorState.getCurrentContent();
+    var selectionState = editorState.getSelection();
+    var anchorKey = selectionState.getAnchorKey();
+    var currentContent = editorState.getCurrentContent();
+    var currentContentBlock = currentContent.getBlockForKey(anchorKey);
+    var start = selectionState.getStartOffset();
+    var end = selectionState.getEndOffset();
+    var selectedText = currentContentBlock.getText().slice(start, end);
+
+    const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', {
+      content,
+      type: content,
+    });
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+    const selectionToReBeReplace = currentSelection.merge({
+      anchorOffset: currentSelection.getAnchorOffset(),
+      focusOffset: currentSelection.getFocusOffset(),
+    });
+
+    let newContentState = Modifier.replaceText(
+      contentStateWithEntity,
+      selectionToReBeReplace,
+      `${selectedText}`,
+      null,
+      entityKey
+    );
+
+    let es = EditorState.push(editorState, newContentState, 'Modify-Entity-Type');
+
+    this.setState({ editorState: es, position: null, isShowDropDown: false });
+  };
+
   onEditorStateChange = (editorState) => {
     const entityObject = getEntityAtSelection(editorState);
+
     if (entityObject && !this.isSelectionRange(editorState)) {
       if (getMatchingSuggestions().indexOf(entityObject.type) !== -1) {
         return this.setState({
@@ -160,6 +196,14 @@ class CustomEditor extends Component {
           isShowDropDown: true,
         });
       }
+    }
+
+    if (this.isSelectionRange(editorState)) {
+      return this.setState({
+        editorState,
+        position: getCaretCoordinates(),
+        isShowDropDown: true,
+      });
     }
 
     this.setState({ editorState });
@@ -192,6 +236,7 @@ class CustomEditor extends Component {
   };
 
   myKeyBindingFn = (e) => {
+    console.log(e.keyCode)
     if (e.keyCode === 75 /* `K` key */ && hasCommandModifier(e)) {
       return OPEN_DROPDOWN;
     }
@@ -212,13 +257,15 @@ class CustomEditor extends Component {
   performOnClickActions() {
     // if not an entity the close the dropdown
     const entityObject = getEntityAtSelection(this.state.editorState);
-    if (!entityObject) {
+    if (!entityObject && !this.isSelectionRange(this.state.editorState)) {
       this.closeDropDown();
     }
   }
 
   handleSuggestionSelected = (text) => {
     const { editorState } = this.state;
+    if (this.isSelectionRange(editorState)) return this.addOnCurrentSelection(editorState, text);
+
     const newEditorState = applySpace(addEntityAndComponent(applySpace(editorState), text));
     this.setState(
       {
@@ -250,6 +297,8 @@ class CustomEditor extends Component {
 
     if (entityObject && this.state.isShowDropDown && !this.isSelectionRange(this.state.editorState))
       return getMatchingSuggestions().indexOf(entityObject.type) !== -1;
+
+    if (this.isSelectionRange(this.state.editorState)) return true;
     return false;
   };
 
@@ -270,16 +319,17 @@ class CustomEditor extends Component {
           />
 
           <DropDownList
-            show={this.isShowAble() && !this.isSelectionRange(editorState)}
+            show={this.isShowAble()}
             activeItem={ce ? ce.type : null}
             position={this.state.position}
             onSelect={this.handleSuggestionSelected}
           />
         </div>
         <code>
-          <pre>{JSON.stringify(editorState.getCurrentContent(), null, 4)}</pre>
-          <pre>{JSON.stringify(getEntityAtSelection(editorState), null, 4)}</pre>
           <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre>
+          {/* <pre>{JSON.stringify(this.state.position, null, 4)}</pre> */}
+          {/* <pre>{JSON.stringify(editorState.getCurrentContent(), null, 4)}</pre> */}
+          <pre>{JSON.stringify(getEntityAtSelection(editorState), null, 4)}</pre>
         </code>
       </div>
     );
