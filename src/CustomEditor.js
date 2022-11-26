@@ -47,9 +47,6 @@ const addEntityAndComponent = (editorState, content) => {
   let contentState = editorState.getCurrentContent();
   const selection = editorState.getSelection();
 
-  const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { content, type: content });
-  const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-
   let newContentState;
   if (currentEntity && currentEntity.entityKey) {
     const anchorKey = selection.getAnchorKey();
@@ -71,17 +68,19 @@ const addEntityAndComponent = (editorState, content) => {
       focusOffset: myEntityRange[myEntityRange.length - 1] + 1,
     });
 
+    const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { type: content });
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+
     newContentState = Modifier.replaceText(
       contentStateWithEntity,
       selectionToReBeReplace,
-      ` ${content.trim()} `,
+      myEntityText,
       null,
       entityKey
     );
-
     // ADD EXISTING CONTENT AS SIMPLE ENTITY
     // const newEditorState1 = EditorState.push(editorState, newContentState, 'INSERT-EXISTING-OLD-AS-ENTITY');
-    // let contentState1 = newEditorState1.getCurrentContent();
+    // newContentState = newEditorState1.getCurrentContent();
 
     // const contentStateWithEntity1 = contentState1.createEntity(myEntityText, 'MUTABLE', { content, type: content });
     // const entityKey1 = contentStateWithEntity1.getLastCreatedEntityKey();
@@ -93,7 +92,11 @@ const addEntityAndComponent = (editorState, content) => {
     //   null
     //   // entityKey1
     // );
-  } else newContentState = Modifier.insertText(contentStateWithEntity, selection, `${content}`, null, entityKey);
+  } else {
+    const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', { type: content });
+    const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
+    newContentState = Modifier.insertText(contentStateWithEntity, selection, `${content}`, null, entityKey);
+  }
 
   const newEditorState = EditorState.push(editorState, newContentState, 'insert-new-component');
 
@@ -137,7 +140,7 @@ const getEntityAtSelection = (editorState) => {
 class CustomEditor extends Component {
   constructor(props) {
     super(props);
-    const rawDataFromServer = `{"blocks":[{"key":"4ulh4","text":"importing selection  component and some other  Component1 with updated   Component1 Cupdatedomponent1 ","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[{"offset":10,"length":21,"key":0},{"offset":47,"length":10,"key":1},{"offset":72,"length":12,"key":2}],"data":{}},{"key":"dc1eh","text":" ","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{"0":{"type":"Component2","mutability":"MUTABLE","data":{"content":"Component2","type":"Component2"}},"1":{"type":"Component1","mutability":"MUTABLE","data":{"content":"Component1","type":"Component1"}},"2":{"type":"Component1","mutability":"MUTABLE","data":{"content":"Component1","type":"Component1"}}}}`
+    const rawDataFromServer = `{"blocks":[{"key":"4ulh4","text":"importing selection  component and some other  Component1 with updated   Component1 Cupdatedomponent1 ","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[{"offset":10,"length":21,"key":0},{"offset":47,"length":10,"key":1},{"offset":72,"length":12,"key":2}],"data":{}},{"key":"dc1eh","text":" ","type":"unstyled","depth":0,"inlineStyleRanges":[],"entityRanges":[],"data":{}}],"entityMap":{"0":{"type":"Component2","mutability":"MUTABLE","data":{"content":"Component2","type":"Component2"}},"1":{"type":"Component1","mutability":"MUTABLE","data":{"content":"Component1","type":"Component1"}},"2":{"type":"Component1","mutability":"MUTABLE","data":{"content":"Component1","type":"Component1"}}}}`;
 
     this.state = {
       editorState: EditorState.createEmpty(),
@@ -153,8 +156,6 @@ class CustomEditor extends Component {
   };
 
   addOnCurrentSelection = (editorState, content) => {
-    const currentSelection = editorState.getSelection();
-
     let contentState = editorState.getCurrentContent();
     var selectionState = editorState.getSelection();
     var anchorKey = selectionState.getAnchorKey();
@@ -165,13 +166,12 @@ class CustomEditor extends Component {
     var selectedText = currentContentBlock.getText().slice(start, end);
 
     const contentStateWithEntity = contentState.createEntity(content, 'MUTABLE', {
-      content,
       type: content,
     });
     const entityKey = contentStateWithEntity.getLastCreatedEntityKey();
-    const selectionToReBeReplace = currentSelection.merge({
-      anchorOffset: currentSelection.getAnchorOffset(),
-      focusOffset: currentSelection.getFocusOffset(),
+    const selectionToReBeReplace = selectionState.merge({
+      anchorOffset: selectionState.getAnchorOffset(),
+      focusOffset: selectionState.getFocusOffset(),
     });
 
     let newContentState = Modifier.replaceText(
