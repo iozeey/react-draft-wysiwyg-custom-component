@@ -26,3 +26,6 @@ To see its working type something in editor and press the key combination.
 - Replaced inline styles with classes
 - Add bootstrap dropdown menu and handle keyboard
 - Allow to Replace entity when selected new from dropdown
+- Add import and export conte
+- Replace selection with clicked component type as entity
+- Allow to Update the type of added Enity and allow update entity content as well
