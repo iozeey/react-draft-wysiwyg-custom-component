@@ -27,17 +27,19 @@ const CustomEditor = ({ initialEditorState }) => {
 
   const onEditorStateChange = (editorState) => {
     const entityObject = getEntityAtSelection({ editorState });
+    const focusKey = editorState.getSelection().getFocusKey();
+    const hasFocus = editorState.getSelection()['hasFocus'];
 
     // if cursor at entity and that is not a selection
     if (entityObject && !isSelectionRange(editorState)) {
       if (getMatchingSuggestions().indexOf(entityObject.type) !== -1) {
-        setPosition(getCaretCoordinates());
+        setPosition(getCaretCoordinates(hasFocus, focusKey));
         setIsShowDropDown(true);
       }
     }
     // if user has selected a range
     if (isSelectionRange(editorState)) {
-      setPosition(getCaretCoordinates());
+      setPosition(getCaretCoordinates(hasFocus, focusKey));
       setIsShowDropDown(true);
     }
 
