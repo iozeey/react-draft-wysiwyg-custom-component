@@ -33,13 +33,13 @@ const CustomEditor = ({ initialEditorState }) => {
     // if cursor at entity and that is not a selection
     if (entityObject && !isSelectionRange(editorState)) {
       if (getMatchingSuggestions().indexOf(entityObject.type) !== -1) {
-        setPosition(getCaretCoordinates(hasFocus, focusKey));
+        setPosition(getCaretCoordinates(hasFocus, focusKey, editor));
         setIsShowDropDown(true);
       }
     }
     // if user has selected a range
     if (isSelectionRange(editorState)) {
-      setPosition(getCaretCoordinates(hasFocus, focusKey));
+      setPosition(getCaretCoordinates(hasFocus, focusKey, editor));
       setIsShowDropDown(true);
     }
 
@@ -51,7 +51,7 @@ const CustomEditor = ({ initialEditorState }) => {
       const focusKey = editorState.getSelection().getFocusKey();
       const hasFocus = editorState.getSelection()['hasFocus'];
 
-      setPosition(getCaretCoordinates(hasFocus, focusKey));
+      setPosition(getCaretCoordinates(hasFocus, focusKey, editor));
       setIsShowDropDown(true);
       return true;
     }
@@ -130,7 +130,7 @@ const CustomEditor = ({ initialEditorState }) => {
     <div>
       <button onClick={() => setRawData(exportData(editorState.getCurrentContent()))}>export</button>
       <button onClick={() => setEditorState(initialEditorState)}>import</button>
-      <div className="editor-wrapper" onClick={performAfterClickActions}>
+      <div className="editor-wrapper" onClick={performAfterClickActions} ref={editor}>
         <Editor
           editorRef={editorRef}
           keyBindingFn={myKeyBindingFn}
@@ -149,9 +149,9 @@ const CustomEditor = ({ initialEditorState }) => {
         />
       </div>
       <code>
-        {rawData && <pre style={{ whiteSpace: 'pre-wrap' }}>{rawData}</pre>}
+        {/* {rawData && <pre style={{ whiteSpace: 'pre-wrap' }}>{rawData}</pre>} */}
         {/* <pre>{JSON.stringify(editorState.getSelection(), null, 4)}</pre> */}
-        {/* <pre>{JSON.stringify(this.state.position, null, 4)}</pre> */}
+        <pre>{JSON.stringify(position, null, 4)}</pre>
         <pre>{JSON.stringify(editorState.getCurrentContent(), null, 4)}</pre>
         {/* <pre>{JSON.stringify(editorState, null, 4)}</pre> */}
       </code>

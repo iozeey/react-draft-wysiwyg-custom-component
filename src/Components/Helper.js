@@ -9,24 +9,18 @@ export const getSelectionRange = () => {
   return selection.getRangeAt(0);
 };
 
-export const getCaretCoordinates = (hasFocus, focusKey) => {
+export const getCaretCoordinates = (hasFocus, focusKey, editorRef) => {
   const range = getSelectionRange();
 
   if (range) {
     const { left: x, top: y } = range.getBoundingClientRect();
-    Object.assign(caretCoordinates, { x, y });
+    const editor = editorRef.current
+    const editorBounds = editorRef.current.getBoundingClientRect()
+    const toolbar = document.getElementsByClassName("rdw-editor-toolbar")[0].getBoundingClientRect()
+    const editorPadding = parseFloat(document.defaultView.getComputedStyle(editor, "").getPropertyValue("padding").replace("px",""));
+    Object.assign(caretCoordinates, { x: x - (x - editorBounds.x > 0 ? editorBounds.x : 0)  , y: y + toolbar.height - editorPadding - (y - editorBounds.y > 0 ? editorBounds.y  : 0)});
   }
 
-  if (hasFocus && caretCoordinates.x === 0 && caretCoordinates.y === 0) {
-    // just grab the position of our editor current selection's block
-    const currentSelectionNodeBounds = document
-      .querySelector(`[data-offset-key^="${focusKey}"]`)
-      .getBoundingClientRect();
-    Object.assign(caretCoordinates, {
-      x: currentSelectionNodeBounds.x,
-      y: currentSelectionNodeBounds.y,
-    });
-  }
   return caretCoordinates;
 };
 
