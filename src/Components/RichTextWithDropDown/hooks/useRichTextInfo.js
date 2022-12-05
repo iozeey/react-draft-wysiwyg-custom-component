@@ -26,7 +26,7 @@ export const useRichTextInfo = () => {
         setLastEntityKey(null);
       }
     },
-    [position]
+    [scroll]
   );
 
   return {
