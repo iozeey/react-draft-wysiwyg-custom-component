@@ -18,7 +18,7 @@ const DropDownList = ({position, show, onSelect, activeItem, items})=>{
     return <Dropdown.Item active={activeItem === value} key={value} eventKey={value.toString()}>
       {label?.toString()}
     </Dropdown.Item>;
-  }), [items]);
+  }), [items, activeItem]);
 
   return <Dropdown
     autoClose="outside"
