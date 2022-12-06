@@ -1,38 +1,76 @@
-import React, {useMemo} from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
+import { RePosition } from './hooks/useRichTextInfo';
+import useWindowScrollPosition from '@rooks/use-window-scroll-position';
+import { useState } from 'react';
+import { useRef } from 'react';
 
-const DropDownList = ({position, show, onSelect, activeItem, items})=>{
-  const positionValue = useMemo(()=>{
-    if(!position){
+const DropDownList = ({
+  position,
+  show,
+  onSelect,
+  activeItem,
+  items,
+  id = 'drop-down-wrapper',
+  editorRef,
+}) => {
+  const scroll = useWindowScrollPosition();
+  const [isSecretlyRender, setIsSecretlyRender] = useState(true);
+  const [dropDownHeight, setDropDownHeight] = useState();
+
+  const dropDownRef = useRef();
+
+  useEffect(() => {
+    if (dropDownRef?.current) {
+      setDropDownHeight(dropDownRef?.current.scrollHeight);
+      setIsSecretlyRender(false);
+    }
+  }, []);
+
+  const positionValue = useMemo(() => {
+    if (!position) {
       return {};
     }
-    
-    const {x, y} = position;
-    return {top: isNaN(y) ? 0: y, left: isNaN(x) ? 0: x, zIndex: 1000,};
-    
-  }, [position]);
-  
-  const itemElements = useMemo(()=>items.map((item)=>{
-    const {value, label} = item;
-    return <Dropdown.Item active={activeItem === value} key={value} eventKey={value.toString()}>
-      {label?.toString()}
-    </Dropdown.Item>;
-  }), [items, activeItem]);
 
-  return <Dropdown
-    autoClose="outside"
-    role="menu"
-    show={show}
-    className={"position-fixed"}
-    focusFirstItemOnShow="keyboard"
-    style={{... positionValue}}
-    onSelect={onSelect}
-  >
-    <Dropdown.Menu show={show}>
-      {itemElements}
-    </Dropdown.Menu>
-  </Dropdown>;
+    let { x, y } = position;
+
+    if (editorRef && dropDownHeight) {
+      const rp = RePosition(editorRef, position, { scrollY: scroll?.scrollY }, dropDownHeight);
+      x = rp.x;
+      y = rp.y;
+    }
+    return { top: isNaN(y) ? 0 : y, left: isNaN(x) ? 0 : x, zIndex: 1000};
+  }, [position, editorRef, dropDownHeight, scroll]);
+
+  const itemElements = useMemo(
+    () =>
+      items.map((item) => {
+        const { value, label } = item;
+        return (
+          <Dropdown.Item active={activeItem === value} key={value} eventKey={value.toString()}>
+            {label?.toString()}
+          </Dropdown.Item>
+        );
+      }),
+    [items, activeItem]
+  );
+
+  return (
+    <Dropdown
+      ref={dropDownRef}
+      id={id}
+      autoClose="outside"
+      role="menu"
+      show={isSecretlyRender || show}
+      className={`position-fixed ${isSecretlyRender ? 'visibility-hidden' : ''}`}
+      focusFirstItemOnShow="keyboard"
+      style={positionValue}
+      onSelect={onSelect}
+    >
+      <Dropdown.Menu show={isSecretlyRender || show}>{itemElements}</Dropdown.Menu>
+    </Dropdown>
+  );
 };
 
 DropDownList.propTypes = {
@@ -40,7 +78,7 @@ DropDownList.propTypes = {
   show: PropTypes.bool,
   onSelect: PropTypes.func,
   items: PropTypes.array,
-  activeItem: PropTypes.string
+  activeItem: PropTypes.string,
 };
 
 export default DropDownList;

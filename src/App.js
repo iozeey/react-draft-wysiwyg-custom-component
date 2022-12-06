@@ -17,7 +17,7 @@ function App() {
           onChange={onChange}
           menuItems={menuItems}
           initialEditorState={parseRichTextRawData(rawDataFromServer)}
-          // toolbarClassName={'d-none'}
+          toolbarClassName={'d-none'}
           editorClassName={'wysiwyg-text-editor embedded p-1'}
         />
       </div>

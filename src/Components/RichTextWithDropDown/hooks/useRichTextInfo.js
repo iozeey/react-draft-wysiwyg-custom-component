@@ -46,6 +46,26 @@ export const getSelectionRange = () => {
   return selection.getRangeAt(0);
 };
 
+export const RePosition = (ref, position, {scrollY}, dropDownHeight) => {
+  const domNode = ref?.current?.wrapper;
+  if (!domNode) {
+    return { x: 0, y: 0 };
+  }
+
+  const docHeight = document.body.scrollHeight;
+  const { top: caretPosition } = CaretOffset(domNode.querySelector('.public-DraftEditor-content'));
+
+  if (dropDownHeight) {
+    const caretBottomDistance = parseInt(docHeight) - parseInt(caretPosition);
+    const isSmall = caretBottomDistance < parseInt(dropDownHeight);
+    const yPlacement = isSmall ? caretPosition - scrollY - dropDownHeight - 10 : position.y;
+
+    return { ...position, y: yPlacement };
+  }
+
+  return position;
+};
+
 export const getCaretPosition = (ref, { scrollX, scrollY }) => {
   const domNode = ref.current?.wrapper;
   if (!domNode) {

@@ -23,7 +23,7 @@ const RichTextWithContentAssist = ({
   const menuInfo = useRichTextInfo();
   const editorProps = useRichTextEditorParams(initialEditorState, menuInfo, menuItems, onChange);
   const menuProps = useRichTextMenuParams(editorProps, menuInfo, menuItems);
-  const { onClick, ...restEditorProps } = editorProps;
+  const { onClick, ref: editorRef, ...restEditorProps } = editorProps;
 
   if (isOutSide) {
     menuInfo.updateInfo(null);
@@ -32,8 +32,8 @@ const RichTextWithContentAssist = ({
 
   return (
     <div onClick={onClick} ref={wrapperRef}>
-      <EditorComponent {...restEditorProps} customDecorators={customDecorators} {...rest} />
-      <DropDownComponent items={menuItems} {...menuProps} />
+      <EditorComponent {...restEditorProps} ref={editorRef} customDecorators={customDecorators} {...rest} />
+      <DropDownComponent items={menuItems} editorRef={editorRef} {...menuProps} />
     </div>
   );
 };
