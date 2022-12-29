@@ -62,7 +62,7 @@ const DropDownList = ({ position, show, onSelect, activeItem, items, id = 'drop-
       role="menu"
       show={isSecretlyRender || show}
       className={`position-fixed ${isSecretlyRender ? 'visibility-hidden' : ''}`}
-      focusFirstItemOnShow
+      focusFirstItemOnShow="keyboard"
       style={positionValue}
       onSelect={onSelect}
       autoFocus
