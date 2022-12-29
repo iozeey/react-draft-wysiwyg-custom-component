@@ -21,9 +21,9 @@ const DropDownList = ({ position, show, onSelect, activeItem, items, id = 'drop-
   }, []);
 
   useEffect(() => {
-    const elm = document.getElementById("drop-down-wrapper")
+    // const elm = document.getElementById("drop-down-wrapper")
     // elm.focus()
-    elm.scrollIntoView()
+    // elm.scrollIntoView()
   }, [show]);
 
   const positionValue = useMemo(() => {
