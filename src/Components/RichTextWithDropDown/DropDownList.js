@@ -6,15 +6,7 @@ import useWindowScrollPosition from '@rooks/use-window-scroll-position';
 import { useState } from 'react';
 import { useRef } from 'react';
 
-const DropDownList = ({
-  position,
-  show,
-  onSelect,
-  activeItem,
-  items,
-  id = 'drop-down-wrapper',
-  editorRef,
-}) => {
+const DropDownList = ({ position, show, onSelect, activeItem, items, id = 'drop-down-wrapper', editorRef }) => {
   const scroll = useWindowScrollPosition();
   const [isSecretlyRender, setIsSecretlyRender] = useState(true);
   const [dropDownHeight, setDropDownHeight] = useState();
@@ -28,6 +20,12 @@ const DropDownList = ({
     }
   }, []);
 
+  useEffect(() => {
+    const elm = document.getElementById("drop-down-wrapper")
+    // elm.focus()
+    elm.scrollIntoView()
+  }, [show]);
+
   const positionValue = useMemo(() => {
     if (!position) {
       return {};
@@ -40,12 +38,12 @@ const DropDownList = ({
       x = rp.x;
       y = rp.y;
     }
-    return { top: isNaN(y) ? 0 : y, left: isNaN(x) ? 0 : x, zIndex: 1000};
+    return { top: isNaN(y) ? 0 : y, left: isNaN(x) ? 0 : x, zIndex: 1000 };
   }, [position, editorRef, dropDownHeight, scroll]);
 
   const itemElements = useMemo(
     () =>
-      items.map((item) => {
+      items.map((item, index) => {
         const { value, label } = item;
         return (
           <Dropdown.Item active={activeItem === value} key={value} eventKey={value.toString()}>
@@ -64,11 +62,14 @@ const DropDownList = ({
       role="menu"
       show={isSecretlyRender || show}
       className={`position-fixed ${isSecretlyRender ? 'visibility-hidden' : ''}`}
-      focusFirstItemOnShow="keyboard"
+      focusFirstItemOnShow
       style={positionValue}
       onSelect={onSelect}
+      autoFocus
     >
-      <Dropdown.Menu show={isSecretlyRender || show}>{itemElements}</Dropdown.Menu>
+      <Dropdown.Menu autoFocus show={isSecretlyRender || show}>
+        {itemElements}
+      </Dropdown.Menu>
     </Dropdown>
   );
 };
